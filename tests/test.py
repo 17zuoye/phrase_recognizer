@@ -66,10 +66,10 @@ class TestPhrasalRecognizer(unittest.TestCase):
         print recognizer; print
 
         data = {
-            u"To fasten or secure with or as if with a cord, rope, or strap: tie the kite to a post; tie up a bundle." : phrases[0:1] + phrases[5:6],  # TODO replace tied
+            u"To fasten or secure with or as if with a cord, rope, or strap: tied the kite to a post; tie up a bundle." : phrases[0:1] + phrases[5:6],
             u"I am used to hitchhiking" : phrases[1:2],
-            u"There are specific things to keep in mind when wash your face" : phrases[2:3], # TODO replace washing
-            u"The Best Foods for 6 Weeks Old Puppies | Dog Care - The Daily" : phrases[3:4], # TODO replace Week
+            u"There are specific things to keep in mind when washing your face" : phrases[2:3],
+            u"The Best Foods for 6 Week Old Puppies | Dog Care - The Daily" : phrases[3:4],
             u"He was(not) going to say hello." : phrases[4:5],
             u"To fasten or secure with or as if with a cord a cake" : phrases[5:6],
         }
