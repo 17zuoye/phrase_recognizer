@@ -14,6 +14,8 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'split_block',
+        'etl_utils',
     ],
     classifiers=[
         'Intended Audience :: Developers',

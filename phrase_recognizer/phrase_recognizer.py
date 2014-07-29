@@ -34,7 +34,7 @@
 
 from split_block import SplitBlockGroup
 
-from .phrase_rules_split import phrase_rules_split, z
+from .phrase_rules_split import phrase_rules_split, z, ld, lemmatize_sentence
 
 dots = "..."
 
@@ -108,15 +108,15 @@ class PhrasalRecognizer():
         self.sentence = sentence # TODO remove me
 
         inspect = self.inspect or inspect
-        if self.inspect: print "#|"*80; print "processing \"%s\"" % sentence
+        if self.inspect: print "#|"*80; print "processing \"%s\"" % self.sentence
 
-        split_block_group = SplitBlockGroup.extract(sentence)
+        split_block_group = SplitBlockGroup.extract(self.sentence)
         candidate_split_block_s = []
 
         # generate candidate_split_block_s
         for letter1 in split_block_group.letters():
             # First string must be chars
-            if letter1.utf8low() in self.first_strs_dict:
+            if ld.lemmatize(letter1.utf8low()) in self.first_strs_dict:
                 candidate_split_block_s.append(letter1)
 
         if dots in self.tree: candidate_split_block_s.append(dots) # TODO
@@ -130,7 +130,7 @@ class PhrasalRecognizer():
                 key1_current = dots
                 sb1_current = split_block_group[0]
             else:
-                key1_current = letter1.utf8low()
+                key1_current = ld.lemmatize(letter1.utf8low())
                 sb1_current = letter1
 
             key1_dict_current = self.tree[key1_current]
@@ -141,9 +141,9 @@ class PhrasalRecognizer():
         letter1_sb_list = sorted(matched_strs__to__phrase.values(), key=lambda i1: -len(i1))
         if inspect: print; print "[letter1_sb_list]", letter1_sb_list
 
-        if replace: sentence = self.generate_replaced_sentence(letter1_sb_list, split_block_group)
+        if replace: self.sentence = self.generate_replaced_sentence(letter1_sb_list, split_block_group)
 
-        return [sentence, matched_strs__to__phrase.keys()]
+        return [self.sentence, matched_strs__to__phrase.keys()]
 
     def recursive_match(self, matched_strs__to__phrase, sb1_current, sb1_list_current, key1_dict_current, key1_current, key1_next=None):
         if self.inspect: print "#"*30, "[key1_current]", key1_current, "[key1_next]", key1_next
@@ -177,14 +177,14 @@ class PhrasalRecognizer():
             if key1_current == dots:
                 if not z(sb1_current.n_sb): break
                 if key1_next:
-                    if key1_next == sb1_current.n_sb.utf8low():
+                    if key1_next == ld.lemmatize(sb1_current.n_sb.utf8low()):
                         self.recursive_match_sub(*params_with(sb1_current))
                         break
                     else:
                         continue
             else:
                 if key1_next:
-                    if key1_next == sb1_current.utf8low():
+                    if key1_next == ld.lemmatize(sb1_current.utf8low()):
                         self.recursive_match_sub(*params_with(sb1_current))
                     continue
                 else:
@@ -209,11 +209,6 @@ class PhrasalRecognizer():
             idx_last  = idx_first + len(sb_list)
             is_break = False
             for idx1 in range(idx_first, idx_last):
-                #try:
-                split_block_group[idx1]
-                #except:
-                #    import pdb; pdb.set_trace()
-
                 if split_block_group[idx1] is None:
                     is_break = True
                     break

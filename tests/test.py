@@ -16,10 +16,10 @@ class TestPhrasalRecognizer(unittest.TestCase):
         self.assertEqual(result1[7], "We ... sometimes ...")
 
         result2 = PhrasalRecognizer.split(u"My name's...=My name is...")
-        self.assertEqual(result2[1], "My name is ...")
+        self.assertEqual(result2[1], u"My name be ...")
 
         result3 = PhrasalRecognizer.split(u"Usually /Sometimes…I go…")
-        self.assertEqual(result3[0], "Usually ... I go ...")
+        self.assertEqual(result3[0], u"Usually ... I go ...")
 
 
     def test_basic_process(self):

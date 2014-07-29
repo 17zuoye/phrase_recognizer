@@ -4,7 +4,7 @@ from split_block import SplitBlockGroup
 
 z = SplitBlockGroup.z # make a short alias
 
-from etl_utils import Unicode
+from etl_utils import Unicode, ld
 import re
 
 def phrase_rules_split(sentence):
@@ -32,6 +32,9 @@ def phrase_rules_split(sentence):
 
     # 再排除纯括号
     sentence = re.sub(u"()", "", sentence)
+
+    # lemmatize
+    sentence = lemmatize_sentence(sentence)
 
     # split all
     result = []
@@ -78,3 +81,10 @@ def sub_split(phrase1):
         if len(new_sbg_list_dup): new_sbg_list = new_sbg_list_dup
 
     return new_sbg_list
+
+def lemmatize_sentence(sentence):
+    sbg = SplitBlockGroup.extract(sentence)
+    for sb1 in sbg:
+        if sb1.is_letter:
+            sb1.string = ld.lemmatize(sb1.string)
+    return sbg.concat_items()
