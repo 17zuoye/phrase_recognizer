@@ -11,11 +11,11 @@ Phrase Recognizer
 Example
 ------------------------
 ```python
-recognizer = PhrasalRecognizer([
-      u"a lot of",
-  ])
-content = u"There are a lot of signs the grass."
-recognizer.process(content, replace=True)  # => [u"There are signs the grass.", [u"a lot of"]]
+>>> from phrase_recognizer import PhrasalRecognizer
+>>> recognizer = PhrasalRecognizer([ u"a lot of", ])
+>>> content = u"There are a lot of signs the grass."
+>>> recognizer.process(content, replace=True)
+[u'There are signs the grass.', [u'a lot of']]
 ```
 
 

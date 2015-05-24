@@ -48,7 +48,7 @@ def check_slash(first_sb, first_sb_idx, current_skiped_idxes):
     current_sb_idx = first_sb_idx
     while(first_sb):
         if z(first_sb.n_sb) and first_sb.n_sb.is_other and (first_sb.n_sb.string == '/') and z(first_sb.n_sb.n_sb) and first_sb.n_sb.n_sb.is_letter:
-            current_skiped_idxes.extend([current_sb_idx + 1,current_sb_idx + 2])
+            current_skiped_idxes.extend([current_sb_idx + 1, current_sb_idx + 2])
             first_sb = first_sb.n_sb.n_sb
             current_sb_idx += 2
         else:

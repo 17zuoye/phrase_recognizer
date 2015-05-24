@@ -34,7 +34,7 @@
 
 from split_block import SplitBlockGroup
 
-from .phrase_rules_split import phrase_rules_split, z, ld, lemmatize_sentence
+from .phrase_rules_split import phrase_rules_split, z, ld
 
 dots = "..."
 
@@ -43,10 +43,16 @@ class Phrase(unicode):
     def __init__(self, s1=u''):
         super(Phrase, self).__init__(s1)
 
+    """
+    # comment below to let tests passed.
     def __repr__(self):
-        """ Don't show phrase in the PhrasalRecognizer#tree,
-        to focus on the structure of the phrase tree. """
+        # Don't show phrase in the PhrasalRecognizer#tree,
+        # to focus on the structure of the phrase tree.
         return "<Phrase>"
+
+    def __eq__(self, s1):
+        return unicode(self) == s1
+    """
 
 
 class PhrasalRecognizer():
@@ -175,7 +181,7 @@ class PhrasalRecognizer():
 
         while sb1_current.n_sb:
             sb1_current     = sb1_current.n_sb  # direct to next, cause current is appended to `sb1_list_current`
-            sb1_current_str = sb1_current.utf8low()
+            # sb1_current_str = sb1_current.utf8low()
             sb1_list_current.append(sb1_current)
             if self.inspect:
                 print "[sb1_current]", "\"%s\"" % sb1_current
@@ -184,7 +190,7 @@ class PhrasalRecognizer():
 
             if phrase_current:
                 is_ender = ((sb1_current.is_other and (sb1_current.utf8low() not in ["'"])) or (sb1_current.n_sb is None))
-                if ( (key1_current == dots) and  is_ender) or \
+                if ((key1_current == dots) and is_ender) or \
                    (key1_current != dots):
                         matched_strs__to__phrase[phrase_current] = SplitBlockGroup(sb1_list_current)  # make a copy
                         if self.inspect:
