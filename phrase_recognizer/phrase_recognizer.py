@@ -38,6 +38,7 @@ from .phrase_rules_split import phrase_rules_split, z, ld, lemmatize_sentence
 
 dots = "..."
 
+
 class Phrase(unicode):
     def __init__(self, s1=u''):
         super(Phrase, self).__init__(s1)
@@ -46,6 +47,7 @@ class Phrase(unicode):
         """ Don't show phrase in the PhrasalRecognizer#tree,
         to focus on the structure of the phrase tree. """
         return "<Phrase>"
+
 
 class PhrasalRecognizer():
     """
@@ -73,7 +75,8 @@ class PhrasalRecognizer():
     """
 
     @classmethod
-    def split(cls, sentence): return phrase_rules_split(sentence)
+    def split(cls, sentence):
+        return phrase_rules_split(sentence)
 
     def __init__(self, phrasal_collocation_s):
         # generate self.first_strs_dict and self.tree these two data structure
@@ -84,31 +87,37 @@ class PhrasalRecognizer():
             for pc2 in PhrasalRecognizer.split(phrasal_collocation1):
                 split_block_group = SplitBlockGroup.extract(str(pc2).lower())
                 # strip both words and spaces
-                strs_list = [sb1.utf8low() for sb1 in split_block_group if sb1.pos_begin is not None] # skip fake sb1
-                if phrasal_collocation2 not in phrase_to_strs_list: phrase_to_strs_list[phrasal_collocation2] = []
+                strs_list = [sb1.utf8low() for sb1 in split_block_group if sb1.pos_begin is not None]  # skip fake sb1
+                if phrasal_collocation2 not in phrase_to_strs_list:
+                    phrase_to_strs_list[phrasal_collocation2] = []
                 phrase_to_strs_list[phrasal_collocation2].append(strs_list)
 
-        self.first_strs_dict = { i2[0] : True for i1 in phrase_to_strs_list.values() for i2 in i1 }
+        self.first_strs_dict = {i2[0]: True for i1 in phrase_to_strs_list.values() for i2 in i1}
 
         self.tree = dict()
         for phrase1 in phrase_to_strs_list:
             for strs1 in phrase_to_strs_list[phrase1]:
                 current_dict = self.tree
                 for idx2, s2 in enumerate(strs1):
-                    if not s2: continue # ignore spaces, and will ignore at search by the way.
+                    if not s2:
+                        continue  # ignore spaces, and will ignore at search by the way.
                     # always a dict
-                    if s2 not in current_dict: current_dict[s2] = dict()
+                    if s2 not in current_dict:
+                        current_dict[s2] = dict()
                     current_dict = current_dict[s2]
                     # mark a ender
-                    if idx2 == (len(strs1) - 1): current_dict[phrase1] = True
+                    if idx2 == (len(strs1) - 1):
+                        current_dict[phrase1] = True
 
         self.inspect = False
 
     def process(self, sentence, inspect=False, replace=False):
-        self.sentence = sentence # TODO remove me
+        self.sentence = sentence  # TODO remove me
 
         inspect = self.inspect or inspect
-        if self.inspect: print "#|"*80; print "processing \"%s\"" % self.sentence
+        if self.inspect:
+            print "#|" * 80
+            print "processing \"%s\"" % self.sentence
 
         split_block_group = SplitBlockGroup.extract(self.sentence)
         candidate_split_block_s = []
@@ -119,12 +128,13 @@ class PhrasalRecognizer():
             if ld.lemmatize(letter1.utf8low()) in self.first_strs_dict:
                 candidate_split_block_s.append(letter1)
 
-        if dots in self.tree: candidate_split_block_s.append(dots) # TODO
+        if dots in self.tree:
+            candidate_split_block_s.append(dots)  # TODO
 
         # generate letter1_sb_list
         matched_strs__to__phrase = dict()
-        for letter1 in candidate_split_block_s: # iterate each matched letter1
-            sb1_list_current = SplitBlockGroup([letter1]) # actually we append it before the current loop here.
+        for letter1 in candidate_split_block_s:  # iterate each matched letter1
+            sb1_list_current = SplitBlockGroup([letter1])  # actually we append it before the current loop here.
 
             if letter1 == dots:
                 key1_current = dots
@@ -139,16 +149,20 @@ class PhrasalRecognizer():
                 self.recursive_match(matched_strs__to__phrase, sb1_current, sb1_list_current, key1_dict_current, key1_current, key1_next)
 
         letter1_sb_list = sorted(matched_strs__to__phrase.values(), key=lambda i1: -len(i1))
-        if inspect: print; print "[letter1_sb_list]", letter1_sb_list
+        if inspect:
+            print
+            print "[letter1_sb_list]", letter1_sb_list
 
-        if replace: self.sentence = self.generate_replaced_sentence(letter1_sb_list, split_block_group)
+        if replace:
+            self.sentence = self.generate_replaced_sentence(letter1_sb_list, split_block_group)
 
         return [self.sentence, matched_strs__to__phrase.keys()]
 
     def recursive_match(self, matched_strs__to__phrase, sb1_current, sb1_list_current, key1_dict_current, key1_current, key1_next=None):
-        if self.inspect: print "#"*30, "[key1_current]", key1_current, "[key1_next]", key1_next
+        if self.inspect:
+            print "#" * 30, "[key1_current]", key1_current, "[key1_next]", key1_next
         key1_dict_next = None if key1_next is None else key1_dict_current[key1_next]
-        phrase_current = ([p1 for p1 in key1_dict_current if isinstance(p1, Phrase)] or [None])[0] # every level has only one phrase.
+        phrase_current = ([p1 for p1 in key1_dict_current if isinstance(p1, Phrase)] or [None])[0]  # every level has only one phrase.
 
         def params_with(k1):
             """ encapsulate parameters in the current scope. """
@@ -160,22 +174,29 @@ class PhrasalRecognizer():
             self.recursive_match_sub(*params_with(sb1_current))
 
         while sb1_current.n_sb:
-            sb1_current     = sb1_current.n_sb # direct to next, cause current is appended to `sb1_list_current`
+            sb1_current     = sb1_current.n_sb  # direct to next, cause current is appended to `sb1_list_current`
             sb1_current_str = sb1_current.utf8low()
             sb1_list_current.append(sb1_current)
-            if self.inspect: print "[sb1_current]", "\"%s\"" % sb1_current
-            if self.inspect: print "len [sb1_list_current]", len(sb1_list_current)
+            if self.inspect:
+                print "[sb1_current]", "\"%s\"" % sb1_current
+            if self.inspect:
+                print "len [sb1_list_current]", len(sb1_list_current)
 
             if phrase_current:
-                is_ender = (( sb1_current.is_other and (sb1_current.utf8low() not in ["'"]) ) or ( sb1_current.n_sb is None))
+                is_ender = ((sb1_current.is_other and (sb1_current.utf8low() not in ["'"])) or (sb1_current.n_sb is None))
                 if ( (key1_current == dots) and  is_ender) or \
-                   (key1_current != dots) :
-                        matched_strs__to__phrase[phrase_current] = SplitBlockGroup(sb1_list_current) # make a copy
-                        if self.inspect: print; print "[end candidate_split_block_s loop : sb1_list_current]", sb1_list_current; print
-                        if key1_next is None: break
+                   (key1_current != dots):
+                        matched_strs__to__phrase[phrase_current] = SplitBlockGroup(sb1_list_current)  # make a copy
+                        if self.inspect:
+                            print
+                            print "[end candidate_split_block_s loop : sb1_list_current]", sb1_list_current
+                            print
+                        if key1_next is None:
+                            break
 
             if key1_current == dots:
-                if not z(sb1_current.n_sb): break
+                if not z(sb1_current.n_sb):
+                    break
                 if key1_next:
                     if key1_next == ld.lemmatize(sb1_current.n_sb.utf8low()):
                         self.recursive_match_sub(*params_with(sb1_current))
@@ -191,7 +212,8 @@ class PhrasalRecognizer():
                     break
 
     def recursive_match_sub(self, key1_dict_next, key1_next, _, matched_strs__to__phrase, sb1_current, sb1_list_current, key1_dict_current, key1_current):
-        if self.inspect: print "."*50, "recursive_match_sub"
+        if self.inspect:
+            print "." * 50, "recursive_match_sub"
         key1_dict_next_keys = [i1 for i1 in key1_dict_current[key1_next] if not isinstance(i1, Phrase)]
         key1_dict_next_keys = key1_dict_next_keys or [None]
         for key1_next_next in key1_dict_next_keys:
@@ -213,7 +235,8 @@ class PhrasalRecognizer():
                     is_break = True
                     break
                 split_block_group[idx1] = None
-            if is_break: continue
+            if is_break:
+                continue
 
             # remove duplicated blank
             if (idx_first > 0) and (idx_last < len(split_block_group)):
@@ -224,7 +247,6 @@ class PhrasalRecognizer():
                     if split_block_group[idx_first - 1].is_blank and split_block_group[idx_last].is_blank:
                         split_block_group[idx_first - 1] = None
         return split_block_group.concat_items().strip().decode("UTF-8")
-
 
     def __repr__(self):
         return str("\n".join(["[first_strs_dict] %s" % self.first_strs_dict,
