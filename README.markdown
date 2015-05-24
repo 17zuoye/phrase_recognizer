@@ -12,10 +12,16 @@ Example
 ------------------------
 ```python
 >>> from phrase_recognizer import PhrasalRecognizer
->>> recognizer = PhrasalRecognizer([ u"a lot of", ])
->>> content = u"There are a lot of signs the grass."
->>> recognizer.process(content, replace=True)
+>>> recognizer = PhrasalRecognizer([ u"a lot of", u"tie...to...", u"or...or...a...a"])
+>>> recognizer
+[first_strs_dict] {u'a': True, u'tie': True, u'or': True}
+
+
+[tree] {u'a': {u'lot': {u'of': {u'a lot of': True}}}, u'tie': {u'...': {u'to': {u'...': {u'tie...to...': True}}}}, u'or': {u'...': {u'or': {u'...': {u'a': {u'...': {u'a': {u'or...or...a...a': True}}}}}}}}
+>>> recognizer.process(u"There are a lot of signs the grass.", replace=True)
 [u'There are signs the grass.', [u'a lot of']]
+>>> recognizer.process(u"To fasten or secure with or as if with a cord, rope, or strap: tied the kite to a post; tie up a bundle.")
+[u'To fasten or secure with or as if with a cord, rope, or strap: tied the kite to a post; tie up a bundle.', [u'or...or...a...a', u'tie...to...']]
 ```
 
 
