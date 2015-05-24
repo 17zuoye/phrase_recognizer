@@ -6,7 +6,7 @@ env:
   matrix:
     - TOXENV=py27
 
-sudo: false
+sudo: true
 
 cache:
   - $HOME/.pip-cache
@@ -16,6 +16,8 @@ install:
   - pip install tox
 
 before_script:
+  - sudo apt-get update
+  - sudo apt-get install enchant
 
 script:
   - python setup.py install
