@@ -162,7 +162,7 @@ class PhrasalRecognizer():
         if replace:
             self.sentence = self.generate_replaced_sentence(letter1_sb_list, split_block_group)
 
-        return [self.sentence, matched_strs__to__phrase.keys()]
+        return [self.sentence, sorted(matched_strs__to__phrase.keys())]
 
     def recursive_match(self, matched_strs__to__phrase, sb1_current, sb1_list_current, key1_dict_current, key1_current, key1_next=None):
         if self.inspect:
